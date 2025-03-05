@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.feature.NotesViewModel
 import com.gahov.encrypted_notes.ui.NotesScreenUi
 import com.gahov.encrypted_notes.ui.theme.MyApplicationTheme
@@ -49,8 +50,33 @@ class MainActivity : ComponentActivity() {
     private fun initViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                notesViewModel.exportImportCallback = object : NotesViewModel.ExportImportCallback {
+                    override fun exportNotes(notesList: List<Note>) {
+                        exportNotesList(notesList)
+                    }
+
+                    override fun importNotes() {
+                        importNotesList()
+                    }
+                }
                 notesViewModel.onStart()
             }
         }
+    }
+
+    private fun importNotesList() {
+        println("need to take this list and save to database")
+    }
+
+    /**
+     * Exports the provided list of notes by creating a share intent.
+     *
+     * This method converts the list of notes into a plain text format and starts an intent chooser
+     * so the user can share the notes via email, messaging apps, etc.
+     *
+     * @param notesList The list of notes to be exported.
+     */
+    private fun exportNotesList(notesList: List<Note>) {
+        println("need to share this list to user")
     }
 }

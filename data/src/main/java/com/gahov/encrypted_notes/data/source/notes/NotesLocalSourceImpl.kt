@@ -15,8 +15,9 @@ class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
 
     override suspend fun fetchNotes(): Flow<Either<Failure, List<NoteDTO>>> {
         return flow {
-            notesDao.fetchAll(now().toEpochMilliseconds()).collect {
-                emit(Either.Right(success = it))
+            notesDao.fetchAll().collect { nonSortedList ->
+                val now = now().toEpochMilliseconds()
+                emit(Either.Right(success = nonSortedList.filter { (it.deletedAt ?: 0L) > now }))
             }
         }.flowOn(Dispatchers.IO).catch { Either.Left(Failure.DataSourceException(it)) }
     }
@@ -43,7 +44,7 @@ class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
 
     override suspend fun deleteById(id: Long): Either<Failure, Unit> {
         return try {
-            Either.Right(notesDao.deleteItemById(id))
+            Either.Right(notesDao.deleteItem(id, now().toEpochMilliseconds()))
         } catch (e: Exception) {
             Either.Left(Failure.DataSourceException(e))
         }

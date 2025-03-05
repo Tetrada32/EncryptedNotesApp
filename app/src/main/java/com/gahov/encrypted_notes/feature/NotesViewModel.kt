@@ -18,6 +18,43 @@ class NotesViewModel @Inject constructor(
     private val notesRepository: NotesRepository
 ) : ViewModel() {
 
+    var exportImportCallback: ExportImportCallback? = null
+
+    /**
+     * Callback interface for handling export and import actions on notes.
+     */
+    interface ExportImportCallback {
+        /**
+         * Called when notes should be exported.
+         *
+         * @param notesList The list of notes to be exported.
+         */
+        fun exportNotes(notesList: List<Note>)
+
+        /**
+         * Called when notes should be imported.
+         */
+        fun importNotes()
+    }
+
+    /**
+     * Represents commands for actions that can be performed on notes.
+     *
+     * Use this sealed interface to distinguish between different commands,
+     * such as importing or exporting notes.
+     */
+    sealed interface ActionCommand {
+        /**
+         * Command for importing notes.
+         */
+        data object Import : ActionCommand
+
+        /**
+         * Command for exporting notes.
+         */
+        data object Export : ActionCommand
+    }
+
     private var fullNotesList = mutableListOf<Note>()
 
     /**
@@ -49,9 +86,8 @@ class NotesViewModel @Inject constructor(
     }
 
     private fun onSuccess(result: List<Note>) {
-        fullNotesList.retainAll(result)
-        fullNotesList.addAll(result)
-        _notesListAsStateFlow.value = result
+        fullNotesList = result.toMutableList()
+        _notesListAsStateFlow.value = result.toList()
     }
 
     private fun onError(f: Failure) {
@@ -74,7 +110,11 @@ class NotesViewModel @Inject constructor(
      */
     fun updateNote(note: Note) {
         //TODO change "isPinned" status
-        viewModelScope.launch { notesRepository.updateNote(note.id!!, note.message.toString(), !note.isPinned) }
+        viewModelScope.launch {
+            note.id?.let {
+                notesRepository.updateNote(it, note.message.toString(), !note.isPinned)
+            }
+        }
     }
 
     /**
@@ -114,6 +154,22 @@ class NotesViewModel @Inject constructor(
                 note.message?.contains(inputData, ignoreCase = true) == true
             }.toMutableList()
             _notesListAsStateFlow.value = filteredNotes.toList()
+        }
+    }
+
+    /**
+     * Processes the given action command to either export or import notes.
+     *
+     * When the command is [ActionCommand.Export], it calls the [ExportImportCallback.exportNotes]
+     * method with the full list of notes. When the command is [ActionCommand.Import], it calls the
+     * [ExportImportCallback.importNotes] method.
+     *
+     * @param command The action command to be processed.
+     */
+    fun onActionCommand(command: ActionCommand) {
+        when (command) {
+            ActionCommand.Export -> exportImportCallback?.exportNotes(fullNotesList)
+            ActionCommand.Import -> exportImportCallback?.importNotes()
         }
     }
 }

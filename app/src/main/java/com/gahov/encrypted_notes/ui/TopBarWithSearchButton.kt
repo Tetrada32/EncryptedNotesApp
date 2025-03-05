@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -48,13 +49,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gahov.encrypted_notes.feature.NotesViewModel
 
 /**
- * Displays a top app bar with an integrated search functionality.
+ * Displays a top app bar with integrated search functionality and a menu.
  *
- * This composable shows an action bar that contains an optional back button, a title,
- * and a search button. When the search button is activated, a search input field is displayed.
- * The search input field's updates are communicated via [onSearchInputUpdate].
+ * This composable shows an action bar that may include an optional back button,
+ * a title, a search button to toggle a search field, and a menu button (three dots)
+ * that opens a dialog to select an action (Export or Import Notes).
  *
  * @param titleText The title to be displayed in the app bar.
  * @param scrollBehavior Optional scroll behavior for the top app bar.
@@ -62,6 +64,8 @@ import androidx.compose.ui.unit.sp
  * @param onBackButtonClickListener Callback invoked when the back button is clicked.
  * @param isSearchButtonEnabled Whether the search functionality is enabled.
  * @param onSearchInputUpdate Callback invoked when the search input is updated.
+ * @param isMenuEnabled Whether the menu button (three dots) is displayed.
+ * @param onMenuCommand Callback invoked with the selected menu command ("export" or "import").
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +76,8 @@ fun TopBarWithSearchButton(
     onBackButtonClickListener: (() -> Unit)? = null,
     isSearchButtonEnabled: Boolean = false,
     onSearchInputUpdate: ((inputData: String) -> Unit)? = null,
+    isMenuEnabled: Boolean = false,
+    onMenuCommand: ((command: NotesViewModel.ActionCommand) -> Unit)? = null,
 ) {
     // Request focus for the search text field when it becomes enabled.
     val focusRequester = remember { FocusRequester() }
@@ -79,6 +85,8 @@ fun TopBarWithSearchButton(
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     // Controls whether the search input field is enabled (visible and focusable).
     var searchFieldEnabled by remember { mutableStateOf(false) }
+    // Controls the visibility of the menu dialog.
+    var showMenuDialog by remember { mutableStateOf(false) }
 
     TopAppBar(
         navigationIcon = {
@@ -121,8 +129,31 @@ fun TopBarWithSearchButton(
                     }
                 }
             }
+            if (isMenuEnabled) {
+                // Display the menu button (three dots) to open the menu dialog.
+                IconButton(
+                    onClick = { showMenuDialog = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "Menu button",
+                        tint = Color.White
+                    )
+                }
+            }
         }
     )
+
+    // Display the menu dialog if requested.
+    if (showMenuDialog) {
+        NotesMenuDialog(
+            onDismiss = { showMenuDialog = false },
+            onCommandSelected = { command ->
+                onMenuCommand?.invoke(command)
+                showMenuDialog = false
+            }
+        )
+    }
 }
 
 /**

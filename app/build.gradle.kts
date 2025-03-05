@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.dagger.hilt)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 android {
@@ -63,10 +64,9 @@ dependencies {
     implementation(libs.androidx.room)
     ksp(libs.androidx.roomcompiler)
 
-    //TODO move to libs
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(project(":data"))
     implementation(project(":domain"))
-
 }

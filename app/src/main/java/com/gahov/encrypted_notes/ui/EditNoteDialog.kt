@@ -55,7 +55,7 @@ fun EditNoteDialog(
                      */
                     if (noteText.isNotBlank()) {
                         val updatedNote = note.copy(
-                            message = noteText
+                            message = noteText,
                         )
                         onNoteUpdated(updatedNote)
                     }

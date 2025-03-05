@@ -39,3 +39,4 @@ app/build/
 
 #NDK
 obj/
+/.kotlin/

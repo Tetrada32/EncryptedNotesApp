@@ -12,11 +12,11 @@ interface NotesDao {
     @Upsert
     fun insertItems(items: List<NoteDTO>)
 
-    @Query("SELECT * FROM notes WHERE deletedAt > :currentDate")
-    fun fetchAll(currentDate: Long): Flow<List<NoteDTO>>
+    @Query("SELECT * FROM notes")
+    fun fetchAll(): Flow<List<NoteDTO>>
 
-    @Query("DELETE FROM notes WHERE uid = :id")
-    fun deleteItemById(id: Long)
+    @Query("UPDATE notes SET deletedAt = :deletedAt WHERE uid = :id")
+    fun deleteItem(id: Long, deletedAt: Long)
 
     @Query("UPDATE notes SET content = :message, isPinned = :isPinned WHERE uid = :id")
     fun updateNote(id: Long, message: String, isPinned: Boolean)

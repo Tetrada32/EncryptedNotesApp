@@ -1,5 +1,7 @@
 package com.gahov.encrypted_notes.domain.entities
 
+import kotlinx.serialization.Serializable
+
 /**
  * Data class representing a note.
  *
@@ -10,6 +12,7 @@ package com.gahov.encrypted_notes.domain.entities
  * @property deletedAt The timestamp (in epoch milliseconds) when the note should be deleted.
  */
 
+@Serializable
 data class Note(
     var id: Long? = 1L,
     var message: String? = null,

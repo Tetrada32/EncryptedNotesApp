@@ -45,12 +45,15 @@ fun NotesScreenUi(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets.safeDrawing,
         topBar = {
-//            CustomTopBar() // without search
             TopBarWithSearchButton(
                 titleText = "My Notes",
                 isBackButtonEnabled = false,
                 isSearchButtonEnabled = true,
-                onSearchInputUpdate = { inputData -> viewModel?.onSearchInputChanged(inputData) }
+                isMenuEnabled = true,
+                onSearchInputUpdate = { inputData -> viewModel?.onSearchInputChanged(inputData) },
+                onMenuCommand = { command ->
+                    viewModel?.onActionCommand(command)
+                }
             )
         },
         floatingActionButton = {
