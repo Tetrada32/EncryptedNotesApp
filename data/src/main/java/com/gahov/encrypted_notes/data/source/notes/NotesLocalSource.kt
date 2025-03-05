@@ -9,13 +9,10 @@ interface NotesLocalSource {
 
     suspend fun fetchNotes(): Flow<Either<Failure, List<NoteDTO>>>
 
-    suspend fun fetchPinnedNotes(): Flow<Either<Failure, List<NoteDTO>>>
-
     suspend fun addNotes(notes: List<NoteDTO>): Either<Failure, Unit>
 
-    suspend fun switchPinStatus(id: Long, isPinned: Boolean): Either<Failure, Unit>
+    suspend fun updateNote(id: Long, message: String, isPinned: Boolean): Either<Failure, Unit>
 
     suspend fun deleteById(id: Long): Either<Failure, Unit>
 
-    suspend fun deleteAllNotes(): Either<Failure, Unit>
 }

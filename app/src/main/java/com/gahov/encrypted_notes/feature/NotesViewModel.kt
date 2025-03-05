@@ -3,11 +3,13 @@ package com.gahov.encrypted_notes.feature
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gahov.encrypted_notes.domain.common.getOrNull
-import com.gahov.encrypted_notes.domain.entities.NoteEntity
+import com.gahov.encrypted_notes.domain.common.Either
+import com.gahov.encrypted_notes.domain.entities.Failure
+import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.domain.repository.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,26 +18,102 @@ class NotesViewModel @Inject constructor(
     private val notesRepository: NotesRepository
 ) : ViewModel() {
 
-    init {
-        saveContent()
-        fetchContent()
-    }
+    private var fullNotesList = mutableListOf<Note>()
 
-    private fun saveContent() {
-        viewModelScope.launch {
-            notesRepository.addNote(NoteEntity(title = "First item", content = "This is my content"))
-            notesRepository.addNote(NoteEntity(title = "Second item", content = "This is my content 2"))
-            notesRepository.addNote(NoteEntity(title = "Third item", content = "This is my content 3"))
-        }
-    }
+    /**
+     *  Private mutable state holding the list of notes.
+     */
+    private val _notesListAsStateFlow = MutableStateFlow(listOf<Note>())
+
+    /**
+     *  Publicly exposed immutable state for observers.
+     */
+    val notesListAsStateFlow = _notesListAsStateFlow.asStateFlow()
+
+
+    /**
+     * Called when the ViewModel starts. Initializes the observation of database notes and,
+     * for testing purposes, populates the state with test data.
+     */
+    fun onStart() { fetchContent() }
 
     private fun fetchContent() {
         viewModelScope.launch {
-            delay(2000)
-            val result = notesRepository.fetchAllNotes()
-            result.collect {
-                Log.d("TAG", "NotesViewModel: fetchedDataFromBD: ${it.getOrNull()}")
+            notesRepository.fetchAllNotes().collect {
+                when (it) {
+                    is Either.Right -> onSuccess(it.success)
+                    is Either.Left -> onError(it.failure)
+                }
             }
+        }
+    }
+
+    private fun onSuccess(result: List<Note>) {
+        fullNotesList.retainAll(result)
+        fullNotesList.addAll(result)
+        _notesListAsStateFlow.value = result
+    }
+
+    private fun onError(f: Failure) {
+        Log.e("FetchFailure", "Fetch content failure: $f")
+    }
+
+    /**
+     * Adds a new note.
+     *
+     * @param note The note to be added.
+     */
+    fun addNote(note: Note) {
+        viewModelScope.launch { notesRepository.addNote(note) }
+    }
+
+    /**
+     * Updates an existing note.
+     *
+     * @param note The note with updated data.
+     */
+    fun updateNote(note: Note) {
+        //TODO change "isPinned" status
+        viewModelScope.launch { notesRepository.updateNote(note.id!!, note.message.toString(), !note.isPinned) }
+    }
+
+    /**
+     * Deletes an existing note.
+     *
+     * Removes the note from the list by its ID.
+     *
+     * @param note The note to be deleted.
+     */
+    fun deleteNote(note: Note) {
+        viewModelScope.launch { note.id?.let { notesRepository.deleteNote(it) } }
+    }
+
+    /**
+     * Filters the notes based on the provided search input.
+     *
+     * This function filters notes by their [Note.message] field. When [inputData] is empty,
+     * the full list of notes is restored. Otherwise, it filters the list to only include notes
+     * whose message contains the [inputData] string (case-insensitive).
+     *
+     * IMPORTANT: This function assumes that [fullNotesList] holds the complete list of notes.
+     * Make sure to update [fullNotesList] appropriately when adding, updating, or deleting notes.
+     *
+     * @param inputData The search query string used to filter notes.
+     */
+    fun onSearchInputChanged(inputData: String) {
+        if (inputData.isBlank()) {
+            /**
+             * If the search input is empty, display the full list of notes.
+             */
+            _notesListAsStateFlow.value = fullNotesList.toList()
+        } else {
+            /**
+             * Filter the full notes list based on the search input (ignoring case).
+             */
+            val filteredNotes = fullNotesList.filter { note ->
+                note.message?.contains(inputData, ignoreCase = true) == true
+            }.toMutableList()
+            _notesListAsStateFlow.value = filteredNotes.toList()
         }
     }
 }

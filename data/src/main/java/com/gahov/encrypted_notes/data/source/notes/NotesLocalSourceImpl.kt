@@ -9,20 +9,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.datetime.Clock.System.now
 
 class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
 
     override suspend fun fetchNotes(): Flow<Either<Failure, List<NoteDTO>>> {
         return flow {
-            notesDao.fetchAll().collect {
-                emit(Either.Right(success = it))
-            }
-        }.flowOn(Dispatchers.IO).catch { Either.Left(Failure.DataSourceException(it)) }
-    }
-
-    override suspend fun fetchPinnedNotes(): Flow<Either<Failure, List<NoteDTO>>> {
-        return flow {
-            notesDao.fetchPinned().collect {
+            notesDao.fetchAll(now().toEpochMilliseconds()).collect {
                 emit(Either.Right(success = it))
             }
         }.flowOn(Dispatchers.IO).catch { Either.Left(Failure.DataSourceException(it)) }
@@ -36,9 +29,13 @@ class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
         }
     }
 
-    override suspend fun switchPinStatus(id: Long, isPinned: Boolean): Either<Failure, Unit> {
+    override suspend fun updateNote(
+        id: Long,
+        message: String,
+        isPinned: Boolean
+    ): Either<Failure, Unit> {
         return try {
-            Either.Right(notesDao.updatePinnedStatus(id = id, isPinned = isPinned))
+            Either.Right(notesDao.updateNote(id, message, isPinned))
         } catch (e: Exception) {
             Either.Left(Failure.DataSourceException(e))
         }
@@ -47,14 +44,6 @@ class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
     override suspend fun deleteById(id: Long): Either<Failure, Unit> {
         return try {
             Either.Right(notesDao.deleteItemById(id))
-        } catch (e: Exception) {
-            Either.Left(Failure.DataSourceException(e))
-        }
-    }
-
-    override suspend fun deleteAllNotes(): Either<Failure, Unit> {
-        return try {
-            Either.Right(notesDao.deleteAll())
         } catch (e: Exception) {
             Either.Left(Failure.DataSourceException(e))
         }

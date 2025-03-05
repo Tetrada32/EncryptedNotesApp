@@ -63,6 +63,9 @@ dependencies {
     implementation(libs.androidx.room)
     ksp(libs.androidx.roomcompiler)
 
+    //TODO move to libs
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+
     implementation(project(":data"))
     implementation(project(":domain"))
 
