@@ -17,10 +17,26 @@ interface DbMapper<InputDomainModel, DbModel> {
     fun toDatabase(domainModel: InputDomainModel): DbModel
 
     /**
+     * Converts an input domain model to a corresponding database model.
+     *
+     * @param domainModelList The list of input domain models to be converted.
+     * @return The resulting database model list.
+     */
+    fun toDatabase(domainModelList: List<InputDomainModel>?): List<DbModel>
+
+    /**
      * Converts a database model to the corresponding domain model.
      *
      * @param dbModel The database model to be converted.
      * @return The resulting domain model.
      */
     fun toDomain(dbModel: DbModel): InputDomainModel
+
+    /**
+     * Converts a database model to the corresponding domain model.
+     *
+     * @param dbModelList The list of database model to be converted.
+     * @return The resulting domain model list.
+     */
+    fun toDomain(dbModelList: List<DbModel>?): List<InputDomainModel>
 }

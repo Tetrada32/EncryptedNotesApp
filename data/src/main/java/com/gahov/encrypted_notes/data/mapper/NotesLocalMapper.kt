@@ -16,9 +16,18 @@ class NotesLocalMapper : DbMapper<NoteEntity, NoteDTO> {
 
     override fun toDomain(dbModel: NoteDTO): NoteEntity {
         return NoteEntity(
+            id = dbModel.uid,
             title = dbModel.title,
             content = dbModel.content,
             isPinned = dbModel.isPinned
         )
+    }
+
+    override fun toDomain(dbModelList: List<NoteDTO>?): List<NoteEntity> {
+        return dbModelList?.map { toDomain(it) } ?: emptyList()
+    }
+
+    override fun toDatabase(domainModelList: List<NoteEntity>?): List<NoteDTO> {
+        return domainModelList?.map { toDatabase(it) } ?: emptyList()
     }
 }
