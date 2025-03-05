@@ -45,5 +45,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
+    //TODO move to libs
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+
     implementation(project(":domain"))
 }
