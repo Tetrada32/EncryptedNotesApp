@@ -1,3 +1,7 @@
+include(":app", ":data", ":domain")
+
+rootProject.name = "Encrypted Notes App"
+
 pluginManagement {
     repositories {
         google {
@@ -18,7 +22,3 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
-rootProject.name = "Encrypted Notes App"
-include(":app")
- 
