@@ -1,8 +1,10 @@
 package com.gahov.encrypted_notes.data.repository.notes
 
 import com.gahov.encrypted_notes.data.mapper.NotesLocalMapper
+import com.gahov.encrypted_notes.data.security.CryptoManager
 import com.gahov.encrypted_notes.data.source.notes.NotesLocalSource
 import com.gahov.encrypted_notes.domain.common.Either
+import com.gahov.encrypted_notes.domain.common.getOrElse
 import com.gahov.encrypted_notes.domain.entities.Failure
 import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.domain.repository.NotesRepository
@@ -13,7 +15,8 @@ import kotlinx.coroutines.withContext
 
 class NotesRepositoryImpl(
     private val localSource: NotesLocalSource,
-    private val localMapper: NotesLocalMapper
+    private val localMapper: NotesLocalMapper,
+    private val cryptoManager: CryptoManager
 ) : NotesRepository {
 
     override suspend fun fetchAllNotes(): Flow<Either<Failure, List<Note>>> {
@@ -39,7 +42,8 @@ class NotesRepositoryImpl(
         isPinned: Boolean
     ): Either<Failure, Unit> {
         return withContext(Dispatchers.IO) {
-            localSource.updateNote(noteId, message, isPinned)
+            val encryptedMessage = cryptoManager.encryptToString(message)
+            localSource.updateNote(noteId, encryptedMessage.getOrElse(""), isPinned)
         }
     }
 

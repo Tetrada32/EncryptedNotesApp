@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.DialogProperties
 import com.gahov.encrypted_notes.domain.entities.Note
-import kotlinx.datetime.Clock.System.now
 
 /**
  * Displays a dialog for editing an existing note.
@@ -56,8 +55,7 @@ fun EditNoteDialog(
                      */
                     if (noteText.isNotBlank()) {
                         val updatedNote = note.copy(
-                            message = noteText,
-                            updatedAt = now().toEpochMilliseconds()
+                            message = noteText
                         )
                         onNoteUpdated(updatedNote)
                     }

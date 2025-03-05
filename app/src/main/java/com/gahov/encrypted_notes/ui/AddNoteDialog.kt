@@ -51,8 +51,7 @@ fun AddNoteDialog(
                         // Create a new note with the entered text and current timestamp.
                         val newNote = Note(
                             message = noteText,
-                            createdAt = currentTimeAsLong,
-                            updatedAt = currentTimeAsLong, // initial update equals creation time
+                            createdAt = currentTimeAsLong
                         )
                         onNoteAdded(newNote)
                     }

@@ -13,7 +13,8 @@ import dagger.hilt.components.SingletonComponent
         MapperModule::class,
         RepositoryModule::class,
         SourceModule::class,
-        DatabaseModule::class
+        DatabaseModule::class,
+        SecurityModule::class
     ]
 )
 @InstallIn(SingletonComponent::class)

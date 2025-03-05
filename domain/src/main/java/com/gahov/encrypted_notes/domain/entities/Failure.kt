@@ -4,4 +4,6 @@ sealed class Failure {
 
     data class DataSourceException(val throwable: Throwable) : Failure()
 
+    data class DataEncryptionException(val throwable: Throwable) : Failure()
+
 }

@@ -7,7 +7,7 @@ package com.gahov.encrypted_notes.domain.entities
  * @property message The content of the note.
  * @property isPinned A boolean, which represents if user pinned the note.
  * @property createdAt The timestamp (in epoch milliseconds) when the note was created.
- * @property updatedAt The timestamp (in epoch milliseconds) when the note was last updated.
+ * @property deletedAt The timestamp (in epoch milliseconds) when the note should be deleted.
  */
 
 data class Note(
@@ -15,6 +15,5 @@ data class Note(
     var message: String? = null,
     var isPinned: Boolean = false,
     var createdAt: Long? = null,
-    var updatedAt: Long? = null,
     var deletedAt: Long? = null
 )

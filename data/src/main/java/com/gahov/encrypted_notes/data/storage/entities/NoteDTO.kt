@@ -6,6 +6,11 @@ import androidx.room.PrimaryKey
 /**
  * An entity representing a note, stored in a database.
  *
+  * @property uid A unique identifier for the note. Generates automatically.
+  * @property content The content of the note.
+  * @property isPinned A boolean, which represents if user pinned the note.
+  * @property createdAt The timestamp (in epoch milliseconds) when the note was created.
+  * @property deletedAt The timestamp (in epoch milliseconds) when the note should be deleted.
  */
 
 @Entity(
@@ -15,7 +20,6 @@ data class NoteDTO(
     var content: String? = "",
     var isPinned: Boolean = false,
     var createdAt: Long? = null,
-    var updatedAt: Long? = null,
     var deletedAt: Long? = Long.MAX_VALUE
 ) {
     /**
