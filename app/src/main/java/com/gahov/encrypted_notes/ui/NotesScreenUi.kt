@@ -29,6 +29,8 @@ import com.gahov.encrypted_notes.feature.NotesViewModel
 @Composable
 fun NotesScreenUi(
     viewModel: NotesViewModel? = null,
+    isDarkThemeEnabled: Boolean = false,
+    themeChangedCallback: ((isDarkThemeEnabledNow: Boolean) -> Unit)? = null,
 ) {
     // State to control the visibility of the "Add Note" dialog.
     var showDialog by remember { mutableStateOf(false) }
@@ -53,7 +55,9 @@ fun NotesScreenUi(
                 onSearchInputUpdate = { inputData -> viewModel?.onSearchInputChanged(inputData) },
                 onMenuCommand = { command ->
                     viewModel?.onActionCommand(command)
-                }
+                },
+                isDarkThemeEnabled = isDarkThemeEnabled,
+                isDarkThemeChangedCallback = themeChangedCallback ?: { /* */ }
             )
         },
         floatingActionButton = {

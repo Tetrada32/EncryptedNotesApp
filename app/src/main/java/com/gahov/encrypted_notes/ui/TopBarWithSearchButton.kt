@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gahov.encrypted_notes.feature.NotesViewModel
 import com.gahov.encrypted_notes.ui.command.ActionCommand
 
 /**
@@ -77,7 +78,9 @@ fun TopBarWithSearchButton(
     isSearchButtonEnabled: Boolean = false,
     onSearchInputUpdate: ((inputData: String) -> Unit)? = null,
     isMenuEnabled: Boolean = false,
-    onMenuCommand: ((command: ActionCommand) -> Unit)? = null,
+    onMenuCommand: ((command: NotesViewModel.ActionCommand) -> Unit)? = null,
+    isDarkThemeEnabled: Boolean,
+    isDarkThemeChangedCallback: (isDarkThemeEnabledNow: Boolean) -> Unit,
 ) {
     // Request focus for the search text field when it becomes enabled.
     val focusRequester = remember { FocusRequester() }
@@ -148,6 +151,10 @@ fun TopBarWithSearchButton(
     if (showMenuDialog) {
         NotesMenuDialog(
             onDismiss = { showMenuDialog = false },
+            darkTheme = isDarkThemeEnabled,
+            onDarkModeToggled = { isEnabled ->
+                isDarkThemeChangedCallback.invoke(isEnabled)
+            },
             onCommandSelected = { command ->
                 onMenuCommand?.invoke(command)
                 showMenuDialog = false
