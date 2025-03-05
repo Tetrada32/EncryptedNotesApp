@@ -1,5 +1,6 @@
 package com.gahov.encrypted_notes.arch.di.module
 
+import com.gahov.encrypted_notes.data.files.JsonFileConverter
 import com.gahov.encrypted_notes.data.mapper.NotesLocalMapper
 import com.gahov.encrypted_notes.data.repository.notes.NotesRepositoryImpl
 import com.gahov.encrypted_notes.data.security.CryptoManager
@@ -20,12 +21,14 @@ class RepositoryModule {
     internal fun provideNotesRepository(
         localSource: NotesLocalSource,
         localMapper: NotesLocalMapper,
-        cryptoManager: CryptoManager
+        cryptoManager: CryptoManager,
+        fileConverter: JsonFileConverter
     ): NotesRepository {
         return NotesRepositoryImpl(
             localSource = localSource,
             localMapper = localMapper,
-            cryptoManager = cryptoManager
+            cryptoManager = cryptoManager,
+            jsonFileConverter = fileConverter
         )
     }
 }

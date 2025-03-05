@@ -24,5 +24,4 @@ class AppModule {
     internal fun provideApplicationContext(application: Application): Context {
         return application.applicationContext
     }
-
 }

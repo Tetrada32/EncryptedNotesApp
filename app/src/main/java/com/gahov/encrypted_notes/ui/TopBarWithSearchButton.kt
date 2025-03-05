@@ -49,7 +49,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gahov.encrypted_notes.feature.NotesViewModel
+import com.gahov.encrypted_notes.ui.command.ActionCommand
 
 /**
  * Displays a top app bar with integrated search functionality and a menu.
@@ -77,7 +77,7 @@ fun TopBarWithSearchButton(
     isSearchButtonEnabled: Boolean = false,
     onSearchInputUpdate: ((inputData: String) -> Unit)? = null,
     isMenuEnabled: Boolean = false,
-    onMenuCommand: ((command: NotesViewModel.ActionCommand) -> Unit)? = null,
+    onMenuCommand: ((command: ActionCommand) -> Unit)? = null,
 ) {
     // Request focus for the search text field when it becomes enabled.
     val focusRequester = remember { FocusRequester() }
