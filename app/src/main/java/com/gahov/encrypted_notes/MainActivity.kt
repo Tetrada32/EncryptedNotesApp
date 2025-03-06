@@ -6,10 +6,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.feature.NotesViewModel
 import com.gahov.encrypted_notes.ui.NotesScreenUi
 import com.gahov.encrypted_notes.ui.theme.MyApplicationTheme
@@ -36,8 +42,13 @@ class MainActivity : ComponentActivity() {
          * Sets the Compose UI content using a custom theme.
          */
         setContent {
-            MyApplicationTheme {
-                NotesScreenUi(notesViewModel)
+            val currentThemeValue = isSystemInDarkTheme()
+            var darkThemeState by remember { mutableStateOf(currentThemeValue) }
+
+            MyApplicationTheme(darkTheme = darkThemeState) {
+                NotesScreenUi(notesViewModel, darkThemeState) { isDarkThemeEnabledNow ->
+                    darkThemeState = isDarkThemeEnabledNow
+                }
             }
         }
 
@@ -53,8 +64,8 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 notesViewModel.exportImportCallback = object : NotesViewModel.ExportImportCallback {
-                    override fun exportNotes(notesFile: File) {
-                        exportNotesList(notesFile)
+                    override fun exportNotes(notesList: List<Note>) {
+                        exportNotesList(notesList)
                     }
 
                     override fun importNotes() {
@@ -82,11 +93,12 @@ class MainActivity : ComponentActivity() {
      *
      * @param exportFile The JSON file to be shared.
      */
-    private fun exportNotesList(exportFile: File) {
+    private fun exportNotesList(exportFile: List<Note>) {
         val fileUri = FileProvider.getUriForFile(
             this,
             "${applicationContext.packageName}.fileprovider",
-            exportFile
+            //TODO: fix later this file!
+            File(exportFile.toString())
         )
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {

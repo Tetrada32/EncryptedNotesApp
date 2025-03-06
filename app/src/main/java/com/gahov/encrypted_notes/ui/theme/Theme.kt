@@ -22,30 +22,23 @@ private val LightColorScheme = lightColorScheme(
 )
 
 /**
- * MyApplicationTheme sets up the Material theme for the application.
+ * Applies the custom Material theme.
  *
- * This composable applies a light or dark color scheme based on the system's current theme.
+ * The [darkTheme] parameter controls which color scheme to use.
+ * When [darkTheme] is true, the dark color scheme is applied;
+ * otherwise, the light color scheme is used.
  *
- * @param darkTheme A Boolean flag to determine whether the dark theme should be used.
- *                  Defaults to the system's current dark theme setting.
- * @param content The UI content that will be styled using the applied theme.
+ * @param darkTheme If true, uses dark theme; if false, uses light theme.
+ * @param content The UI content styled with the theme.
  */
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    /**
-     * Choose the color scheme based on whether darkTheme is true or false.
-     */
-    val colorScheme = when {
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    // Choose the color scheme based on the darkTheme flag.
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-    /**
-     *  Apply the selected color scheme to MaterialTheme.
-     */
     MaterialTheme(
         colorScheme = colorScheme,
         content = content
