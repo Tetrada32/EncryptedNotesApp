@@ -3,7 +3,6 @@ package com.gahov.encrypted_notes
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,10 +20,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.gahov.encrypted_notes.arch.callback.ExportImportCallback
 import com.gahov.encrypted_notes.ui.NotesScreenUi
 import com.gahov.encrypted_notes.ui.theme.MyApplicationTheme
+import com.gahov.encrypted_notes.utils.uriToFile
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.IOException
 
 /**
  * MainActivity serves as the entry point of the application.
@@ -117,8 +116,7 @@ class MainActivity : ComponentActivity() {
      * and then passes it to the JSON converter for parsing.
      */
     private fun importNotesList() {
-        val mimeTypes = arrayOf("application/json", "text/plain")
-        importFileLauncher.launch(mimeTypes)
+        importFileLauncher.launch(arrayOf("application/json", "text/plain"))
     }
 
     /**
@@ -131,32 +129,8 @@ class MainActivity : ComponentActivity() {
                     selectedUri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                val tempFile = uriToFile(selectedUri)
-                if (tempFile != null) {
-                    try {
-                        notesViewModel.importNotes(tempFile)
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Invalid JSON format", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                val tempFile = uriToFile(cacheDir, selectedUri, contentResolver) ?: return@let
+                notesViewModel.importNotes(tempFile)
             }
         }
-
-    /**
-     * Converts Uri to File by copying content to a temporary file.
-     */
-    private fun uriToFile(uri: Uri): File? {
-        return try {
-            val tempFile = File(cacheDir, "imported_notes.json")
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                tempFile.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            tempFile
-        } catch (e: IOException) {
-            Toast.makeText(this, "Error reading file", Toast.LENGTH_SHORT).show()
-            null
-        }
-    }
 }
