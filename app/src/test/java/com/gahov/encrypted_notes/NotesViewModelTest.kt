@@ -10,6 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -161,21 +162,51 @@ class NotesViewModelTest {
     }
 
     @Test
-    fun `deleteNote calls repository deleteNote`() = runTest {
-        // Assert
+    fun `deleteNote calls repository deleteNote and updates state`() = runTest {
+        // Arrange
         val noteId = 1L
-        val noteToDelete = mockk<Note> {
-            every { id } returns 1L
+
+        val note = mockk<Note> {
+            every { message } returns "title"
+            every { deletedAt } returns null
+            every { createdAt } returns 1000L
+            every { isPinned } returns false
         }
+        val note2 = mockk<Note> {
+            every { message } returns "message"
+            every { deletedAt } returns null
+            every { createdAt } returns 1100L
+            every { isPinned } returns false
+        }
+        val noteToDelete = mockk<Note> {
+            every { id } returns noteId
+            every { message } returns "to delete"
+            every { deletedAt } returns null
+            every { createdAt } returns 1050L
+            every { isPinned } returns false
+        }
+        // "before" list contains three notes; "after" list excludes the note to delete.
+        val before = listOf(note, noteToDelete, note2)
+        val after = listOf(note, note2)
+
+        // Use a mutable state flow to simulate repository emissions.
+        val notesFlow = MutableStateFlow(Either.Right(before))
+        coEvery { notesRepository.fetchAllNotes() } returns notesFlow
         coEvery { notesRepository.deleteNote(eq(noteId)) } returns Either.Right(Unit)
 
         // Act
+        viewModel.onStart() // Start collecting repository updates.
         viewModel.deleteNote(noteToDelete)
+        // Simulate that the repository now emits the updated list (after deletion).
+        notesFlow.value = Either.Right(after)
         advanceUntilIdle()
 
-        // Verify
+        // Verify that the repository's delete method was called once.
         coVerify(exactly = 1) { notesRepository.deleteNote(eq(noteId)) }
+        // Assert that the state flow is updated to the "after" list.
+        assertEquals(after, viewModel.notesListAsStateFlow.value)
     }
+
 
     @After
     fun tearDown() {
