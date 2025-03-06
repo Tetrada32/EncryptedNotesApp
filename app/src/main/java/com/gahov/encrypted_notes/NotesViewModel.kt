@@ -1,16 +1,22 @@
-package com.gahov.encrypted_notes.feature
+package com.gahov.encrypted_notes
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gahov.encrypted_notes.arch.callback.ExportImportCallback
+import com.gahov.encrypted_notes.arch.command.ActionCommand
 import com.gahov.encrypted_notes.domain.common.Either
+import com.gahov.encrypted_notes.domain.common.getOrNull
 import com.gahov.encrypted_notes.domain.entities.Failure
 import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.domain.repository.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,41 +25,6 @@ class NotesViewModel @Inject constructor(
 ) : ViewModel() {
 
     var exportImportCallback: ExportImportCallback? = null
-
-    /**
-     * Callback interface for handling export and import actions on notes.
-     */
-    interface ExportImportCallback {
-        /**
-         * Called when notes should be exported.
-         *
-         * @param notesList The list of notes to be exported.
-         */
-        fun exportNotes(notesList: List<Note>)
-
-        /**
-         * Called when notes should be imported.
-         */
-        fun importNotes()
-    }
-
-    /**
-     * Represents commands for actions that can be performed on notes.
-     *
-     * Use this sealed interface to distinguish between different commands,
-     * such as importing or exporting notes.
-     */
-    sealed interface ActionCommand {
-        /**
-         * Command for importing notes.
-         */
-        data object Import : ActionCommand
-
-        /**
-         * Command for exporting notes.
-         */
-        data object Export : ActionCommand
-    }
 
     private var fullNotesList = mutableListOf<Note>()
 
@@ -165,9 +136,20 @@ class NotesViewModel @Inject constructor(
      */
     fun onActionCommand(command: ActionCommand) {
         when (command) {
-            ActionCommand.Export -> exportImportCallback?.exportNotes(fullNotesList)
+            ActionCommand.Export -> viewModelScope.launch { prepareFile()?.let {
+                exportImportCallback?.exportNotes(it) } }
             ActionCommand.Import -> exportImportCallback?.importNotes()
         }
+    }
+
+    private suspend fun prepareFile(): File? {
+        return withContext(Dispatchers.IO) {
+           notesRepository.prepareToExportNotes().getOrNull()
+        }
+    }
+
+    fun importNotes(notes: File) {
+        viewModelScope.launch { notesRepository.importNotes(notes) }
     }
 
     /**

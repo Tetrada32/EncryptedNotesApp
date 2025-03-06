@@ -2,7 +2,7 @@ package com.gahov.encrypted_notes.data.repository.notes
 
 import com.gahov.encrypted_notes.data.files.JsonFileConverter
 import com.gahov.encrypted_notes.data.mapper.NotesLocalMapper
-import com.gahov.encrypted_notes.data.security.CryptoManager
+import com.gahov.encrypted_notes.data.security.manager.CryptoManager
 import com.gahov.encrypted_notes.data.source.notes.NotesLocalSource
 import com.gahov.encrypted_notes.domain.common.Either
 import com.gahov.encrypted_notes.domain.common.getOrElse
@@ -62,12 +62,24 @@ class NotesRepositoryImpl(
                 is Either.Left -> result
                 is Either.Right -> {
                     try {
-                        Either.Right(jsonFileConverter.toJson(result.success))
+                        val encryptedData = localMapper.toDatabase(result.success)
+                        Either.Right(jsonFileConverter.toJson(encryptedData))
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Either.Left(Failure.DataSourceException(e))
                     }
                 }
+            }
+        }
+    }
+
+    override suspend fun importNotes(notesFile: File): Either<Failure, Unit> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val notes = jsonFileConverter.fromJson(notesFile)
+                localSource.addNotes(notes)
+            } catch (e: Exception) {
+                Either.Left(Failure.DataSourceException(e))
             }
         }
     }

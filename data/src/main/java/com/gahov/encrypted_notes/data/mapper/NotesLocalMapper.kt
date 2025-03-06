@@ -1,7 +1,7 @@
 package com.gahov.encrypted_notes.data.mapper
 
 import com.gahov.encrypted_notes.data.common.DbMapper
-import com.gahov.encrypted_notes.data.security.CryptoManager
+import com.gahov.encrypted_notes.data.security.manager.CryptoManager
 import com.gahov.encrypted_notes.data.storage.entities.NoteDTO
 import com.gahov.encrypted_notes.domain.common.getOrNull
 import com.gahov.encrypted_notes.domain.entities.Note
@@ -30,10 +30,18 @@ class NotesLocalMapper(
     }
 
     override fun toDomain(dbModelList: List<NoteDTO>?): List<Note> {
-        return dbModelList?.map { toDomain(it) } ?: emptyList()
+        return try {
+            dbModelList?.map { toDomain(it) } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     override fun toDatabase(domainModelList: List<Note>?): List<NoteDTO> {
-        return domainModelList?.map { toDatabase(it) } ?: emptyList()
+        return try {
+            return domainModelList?.map { toDatabase(it) } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }

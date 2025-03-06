@@ -3,7 +3,7 @@ package com.gahov.encrypted_notes.arch.di.module
 import com.gahov.encrypted_notes.data.files.JsonFileConverter
 import com.gahov.encrypted_notes.data.mapper.NotesLocalMapper
 import com.gahov.encrypted_notes.data.repository.notes.NotesRepositoryImpl
-import com.gahov.encrypted_notes.data.security.CryptoManager
+import com.gahov.encrypted_notes.data.security.manager.CryptoManager
 import com.gahov.encrypted_notes.data.source.notes.NotesLocalSource
 import com.gahov.encrypted_notes.domain.repository.NotesRepository
 import dagger.Module

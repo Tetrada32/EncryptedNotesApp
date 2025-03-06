@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.gahov.encrypted_notes.domain.entities.Note
-import com.gahov.encrypted_notes.feature.NotesViewModel
+import com.gahov.encrypted_notes.NotesViewModel
 
 
 /**

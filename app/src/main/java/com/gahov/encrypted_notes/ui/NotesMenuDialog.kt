@@ -16,8 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gahov.encrypted_notes.feature.NotesViewModel
-import com.gahov.encrypted_notes.ui.command.ActionCommand
+import com.gahov.encrypted_notes.arch.command.ActionCommand
 
 /**
  * Displays a dialog that allows the user to choose an action: Export, Import or toggle Dark Mode.
@@ -35,7 +34,7 @@ fun NotesMenuDialog(
     onDismiss: () -> Unit,
     darkTheme: Boolean,
     onDarkModeToggled: (Boolean) -> Unit,
-    onCommandSelected: (command: NotesViewModel.ActionCommand) -> Unit,
+    onCommandSelected: (command: ActionCommand) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -47,7 +46,7 @@ fun NotesMenuDialog(
                     text = "Export Notes",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onCommandSelected(NotesViewModel.ActionCommand.Export) },
+                        .clickable { onCommandSelected(ActionCommand.Export) },
                     style = MaterialTheme.typography.bodyLarge
                 )
                 // Option for importing notes.
@@ -55,7 +54,7 @@ fun NotesMenuDialog(
                     text = "Import Notes",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onCommandSelected(NotesViewModel.ActionCommand.Import) }
+                        .clickable { onCommandSelected(ActionCommand.Import) }
                         .padding(top = 12.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )

@@ -1,4 +1,4 @@
-package com.gahov.encrypted_notes.ui.command
+package com.gahov.encrypted_notes.arch.command
 
 /**
  * Represents commands for actions that can be performed on notes.

@@ -3,7 +3,7 @@ package com.gahov.encrypted_notes.arch.di.module
 import android.app.Application
 import com.gahov.encrypted_notes.data.files.JsonFileConverter
 import com.gahov.encrypted_notes.data.mapper.NotesLocalMapper
-import com.gahov.encrypted_notes.data.security.CryptoManager
+import com.gahov.encrypted_notes.data.security.manager.CryptoManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

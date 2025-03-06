@@ -1,4 +1,4 @@
-package com.gahov.encrypted_notes.data.security
+package com.gahov.encrypted_notes.data.security.manager
 
 import com.gahov.encrypted_notes.domain.common.Either
 import com.gahov.encrypted_notes.domain.entities.Failure

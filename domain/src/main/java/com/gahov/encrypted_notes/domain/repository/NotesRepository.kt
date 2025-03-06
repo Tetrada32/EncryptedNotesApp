@@ -18,4 +18,6 @@ interface NotesRepository {
 
     suspend fun prepareToExportNotes(): Either<Failure, File>
 
+    suspend fun importNotes(notesFile: File): Either<Failure, Unit>
+
 }

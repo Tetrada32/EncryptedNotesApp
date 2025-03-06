@@ -1,10 +1,13 @@
 package com.gahov.encrypted_notes
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
@@ -15,13 +18,13 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.gahov.encrypted_notes.domain.entities.Note
-import com.gahov.encrypted_notes.feature.NotesViewModel
+import com.gahov.encrypted_notes.arch.callback.ExportImportCallback
 import com.gahov.encrypted_notes.ui.NotesScreenUi
 import com.gahov.encrypted_notes.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.IOException
 
 /**
  * MainActivity serves as the entry point of the application.
@@ -63,9 +66,9 @@ class MainActivity : ComponentActivity() {
     private fun initViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                notesViewModel.exportImportCallback = object : NotesViewModel.ExportImportCallback {
-                    override fun exportNotes(notesList: List<Note>) {
-                        exportNotesList(notesList)
+                notesViewModel.exportImportCallback = object : ExportImportCallback {
+                    override fun exportNotes(file: File) {
+                        exportNotesList(file)
                     }
 
                     override fun importNotes() {
@@ -77,11 +80,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun importNotesList() {
-        println("need to take this list and save to database")
-    }
-
-    // TODO: complete this fun
     /**
      * Shares the provided JSON file via an intent.
      *
@@ -93,12 +91,11 @@ class MainActivity : ComponentActivity() {
      *
      * @param exportFile The JSON file to be shared.
      */
-    private fun exportNotesList(exportFile: List<Note>) {
+    private fun exportNotesList(exportFile: File) {
         val fileUri = FileProvider.getUriForFile(
             this,
             "${applicationContext.packageName}.fileprovider",
-            //TODO: fix later this file!
-            File(exportFile.toString())
+            exportFile
         )
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -109,5 +106,57 @@ class MainActivity : ComponentActivity() {
 
         val chooserIntent = Intent.createChooser(shareIntent, "Share notes via")
         startActivity(chooserIntent)
+    }
+
+    /**
+     * Launches file picker to select a JSON or TXT file for import.
+     *
+     * This method creates and launches an intent to pick a file from the device storage.
+     * It expects a file with MIME types "application/json" or "text/plain". Once a file is selected,
+     * the ActivityResultLauncher obtains persistable read permission, converts the file URI to a File,
+     * and then passes it to the JSON converter for parsing.
+     */
+    private fun importNotesList() {
+        val mimeTypes = arrayOf("application/json", "text/plain")
+        importFileLauncher.launch(mimeTypes)
+    }
+
+    /**
+     * ActivityResultLauncher to handle file selection result.
+     */
+    private val importFileLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            uri?.let { selectedUri ->
+                contentResolver.takePersistableUriPermission(
+                    selectedUri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                val tempFile = uriToFile(selectedUri)
+                if (tempFile != null) {
+                    try {
+                        notesViewModel.importNotes(tempFile)
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Invalid JSON format", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+    /**
+     * Converts Uri to File by copying content to a temporary file.
+     */
+    private fun uriToFile(uri: Uri): File? {
+        return try {
+            val tempFile = File(cacheDir, "imported_notes.json")
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                tempFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            tempFile
+        } catch (e: IOException) {
+            Toast.makeText(this, "Error reading file", Toast.LENGTH_SHORT).show()
+            null
+        }
     }
 }

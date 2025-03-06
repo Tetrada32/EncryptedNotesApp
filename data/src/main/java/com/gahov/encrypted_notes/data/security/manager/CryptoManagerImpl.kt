@@ -1,14 +1,10 @@
-package com.gahov.encrypted_notes.data.security
+package com.gahov.encrypted_notes.data.security.manager
 
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.gahov.encrypted_notes.data.security.key.SecretKeyProvider
 import com.gahov.encrypted_notes.domain.common.Either
 import com.gahov.encrypted_notes.domain.entities.Failure
-import java.security.KeyStore
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 /**
@@ -17,50 +13,13 @@ import javax.crypto.spec.GCMParameterSpec
  * The encryption method returns a single string that contains both the IV and the cipher text,
  * separated by a colon (:), after encoding them in Base64.
  */
-class CryptoManagerImpl : CryptoManager {
+class CryptoManagerImpl(
+    private val keyProvider: SecretKeyProvider
+): CryptoManager {
 
     companion object {
-        private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val TRANSFORMATION = "AES/GCM/NoPadding"
-        private const val KEY_ALIAS = "notes_key"
-        private const val KEY_SIZE = 256
         private const val TAG_LENGTH = 128
-    }
-
-    private val keyStore: KeyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
-
-    init {
-        if (!keyStore.containsAlias(KEY_ALIAS)) {
-            generateKey()
-        }
-    }
-
-
-    /**
-     * Generates an AES key and stores it in the Android Keystore.
-     */
-    private fun generateKey() {
-        val keyGenerator =
-            KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
-        val keyGenParameterSpec = KeyGenParameterSpec.Builder(
-            KEY_ALIAS,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-        )
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-            .setKeySize(KEY_SIZE)
-            .build()
-        keyGenerator.init(keyGenParameterSpec)
-        keyGenerator.generateKey()
-    }
-
-    /**
-     * Retrieves the secret key from the Keystore.
-     *
-     * @return the SecretKey used for encryption and decryption.
-     */
-    private fun getSecretKey(): SecretKey {
-        return (keyStore.getEntry(KEY_ALIAS, null) as KeyStore.SecretKeyEntry).secretKey
     }
 
     /**
@@ -73,7 +32,7 @@ class CryptoManagerImpl : CryptoManager {
     override fun encryptToString(plainText: String?): Either<Failure, String> {
         try {
             val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
+            cipher.init(Cipher.ENCRYPT_MODE, keyProvider.getSecretKey())
             val iv = cipher.iv
             val cipherText = cipher.doFinal(plainText?.toByteArray(Charsets.UTF_8))
 
@@ -103,7 +62,7 @@ class CryptoManagerImpl : CryptoManager {
             val cipherText = Base64.decode(parts[1], Base64.NO_WRAP)
             val cipher = Cipher.getInstance(TRANSFORMATION)
             val spec = GCMParameterSpec(TAG_LENGTH, iv)
-            cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), spec)
+            cipher.init(Cipher.DECRYPT_MODE, keyProvider.getSecretKey(), spec)
             val decryptedBytes = cipher.doFinal(cipherText)
             return Either.Right(String(decryptedBytes, Charsets.UTF_8))
         } catch (e: Exception) {
