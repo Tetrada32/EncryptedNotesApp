@@ -114,14 +114,13 @@ class NotesRepositoryImpl(
      * a [File] representing the exported notes if successful.
      */
     override suspend fun prepareToExportNotes(): Either<Failure, File> {
-        val result = fetchAllNotes().first()
+        val result = localSource.fetchNotes().first()
         return withContext(Dispatchers.IO) {
             when (result) {
                 is Either.Left -> result
                 is Either.Right -> {
                     try {
-                        val encryptedData = localMapper.toDatabase(result.success)
-                        Either.Right(jsonFileConverter.toJson(encryptedData))
+                        Either.Right(jsonFileConverter.toJson(result.success))
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Either.Left(Failure.DataSourceException(e))
