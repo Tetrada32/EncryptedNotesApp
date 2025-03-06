@@ -34,11 +34,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.hilt)
-    testImplementation(libs.testng)
     ksp(libs.androidx.hiltcompiler)
 
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.testng)
     implementation(libs.kotlinx.serialization.json)
 }

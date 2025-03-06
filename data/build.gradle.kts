@@ -36,18 +36,15 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(libs.androidx.hilt)
-    testImplementation(libs.testng)
     ksp(libs.androidx.hiltcompiler)
 
     implementation(libs.androidx.room)
     ksp(libs.androidx.roomcompiler)
 
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     implementation(project(":domain"))
 }
