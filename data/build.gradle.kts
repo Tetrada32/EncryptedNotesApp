@@ -41,10 +41,14 @@ dependencies {
     implementation(libs.androidx.room)
     ksp(libs.androidx.roomcompiler)
 
+    testImplementation(libs.testng)
     testImplementation(libs.junit)
     testImplementation(libs.androidx.core.testing)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(project(":domain"))
 }
