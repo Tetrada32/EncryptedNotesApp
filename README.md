@@ -7,6 +7,7 @@ Ever worried someone might peek at your private thoughts, sensitive ideas, or se
 This app ensures your notes are encrypted, secure, and accessible only to you, 
 offering peace of mind with a sprinkle of fun! 🤫🔒
 
+<img src="images/IMG1.png" alt="Main Screen" width="250"/>
 ---
 
 ## 🚀 Principles of Encrypted Notes App:
@@ -24,14 +25,18 @@ offering peace of mind with a sprinkle of fun! 🤫🔒
 - 🔍 **Search:** Quickly find notes by their titles.
 - 🌙 **Offline Support:** No need for an internet connection; your notes travel with you wherever you go!
 
+<img src="images/IMG2.png" alt="Edit Note" width="250"/>
+
 ---
 
 ## 🌟 Bonus Features
-Ø
+
 - 📤📥 **Export/Import:** Easily backup or move your encrypted notes across devices.
 - 🌙☀️ **Dark Mode Toggle:** Switch effortlessly between light and dark modes to match your mood.
 - 📌 **Pinned Notes:** Important notes stay at the top, just like your favorite sticky notes!
 - ⏳ **Self-destructing Notes:** Notes that vanish automatically after a set time—perfect for your top-secret info!
+
+<img src="images/IMG3.png" alt="Dark Mode" width="250"/>
 
 ---
 
@@ -45,6 +50,8 @@ offering peace of mind with a sprinkle of fun! 🤫🔒
 - **Coroutines & Flow**
 - **Unit Tests (JUnit, MockK)**
 
+<img src="images/IMG4.png" alt="Time Picker" width="250"/>
+
 ---
 
 ## ✅ Testing
@@ -52,6 +59,8 @@ offering peace of mind with a sprinkle of fun! 🤫🔒
 The app has robust testing coverage:
 - **Encryption logic:** Ensures notes are correctly encrypted and decrypted.
 - **ViewModel logic:** Guarantees stable and predictable app behavior.
+
+<img src="images/IMG5.png" alt="Delete Dialog" width="250"/>
 
 ---
 
@@ -61,7 +70,8 @@ The app has robust testing coverage:
 2. **Open the app** and start creating your secure notes!
 3. **Enjoy** peace of mind with your privacy intact! 😉
 
+<img src="images/IMG6.png" alt="List of Notes" width="250"/>
+
 ---
 
 Made with 🔐 by Danil Gahov 😎
-
