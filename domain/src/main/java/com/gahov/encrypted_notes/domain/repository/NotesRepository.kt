@@ -12,7 +12,7 @@ interface NotesRepository {
 
     suspend fun addNote(note: Note): Either<Failure, Unit>
 
-    suspend fun updateNote(noteId: Long, message: String, isPinned: Boolean): Either<Failure, Unit>
+    suspend fun updateNote(noteId: Long, message: String, isPinned: Boolean, deletedAt: Long): Either<Failure, Unit>
 
     suspend fun deleteNote(noteId: Long): Either<Failure, Unit>
 

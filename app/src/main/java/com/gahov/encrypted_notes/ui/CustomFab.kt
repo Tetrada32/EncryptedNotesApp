@@ -24,7 +24,7 @@ fun CustomFab(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
-        modifier = Modifier.size(100.dp),
+        modifier = Modifier.size(80.dp),
         onClick = onClick,
         shape = CircleShape
     ) {

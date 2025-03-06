@@ -12,10 +12,12 @@ import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.domain.repository.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock.System.now
 import java.io.File
 import javax.inject.Inject
 
@@ -60,7 +62,10 @@ class NotesViewModel @Inject constructor(
         // Update the full list from the repository.
         fullNotesList = result.toMutableList()
         // Sort the notes: pinned ones first, then by createdAt descending.
-        _notesListAsStateFlow.value = sortNotes(fullNotesList)
+        val sortedNotes = sortNotes(fullNotesList)
+        _notesListAsStateFlow.value = sortedNotes
+        // Plan updates for deletion of notes
+        scheduleNextDeletionCheck(sortedNotes)
     }
 
     private fun onError(f: Failure) {
@@ -84,7 +89,12 @@ class NotesViewModel @Inject constructor(
     fun updateNote(note: Note) {
         viewModelScope.launch {
             note.id?.let {
-                notesRepository.updateNote(it, note.message.toString(), note.isPinned)
+                notesRepository.updateNote(
+                    it,
+                    note.message.toString(),
+                    note.isPinned,
+                    note.deletedAt ?: Long.MAX_VALUE
+                )
             }
         }
     }
@@ -164,5 +174,18 @@ class NotesViewModel @Inject constructor(
             compareByDescending<Note> { it.isPinned }
                 .thenBy { it.createdAt ?: 0L }
         )
+    }
+
+    private fun scheduleNextDeletionCheck(notes: List<Note>) {
+        val currentTime = now().toEpochMilliseconds()
+        val futureDeletionTimes = notes.mapNotNull { it.deletedAt }.filter { it > currentTime }
+        val nextDeletionTime = futureDeletionTimes.minOrNull()
+        if (nextDeletionTime != null) {
+            val delayMillis = nextDeletionTime - currentTime
+            viewModelScope.launch {
+                delay(delayMillis)
+                fetchContent()
+            }
+        }
     }
 }

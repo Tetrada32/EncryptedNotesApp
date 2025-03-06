@@ -33,10 +33,11 @@ class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
     override suspend fun updateNote(
         id: Long,
         message: String,
-        isPinned: Boolean
+        isPinned: Boolean,
+        deletedAt: Long,
     ): Either<Failure, Unit> {
         return try {
-            Either.Right(notesDao.updateNote(id, message, isPinned))
+            Either.Right(notesDao.updateNote(id, message, isPinned, deletedAt))
         } catch (e: Exception) {
             Either.Left(Failure.DataSourceException(e))
         }

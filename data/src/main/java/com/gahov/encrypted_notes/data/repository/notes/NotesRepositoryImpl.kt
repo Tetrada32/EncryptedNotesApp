@@ -43,11 +43,12 @@ class NotesRepositoryImpl(
     override suspend fun updateNote(
         noteId: Long,
         message: String,
-        isPinned: Boolean
+        isPinned: Boolean,
+        deletedAt: Long,
     ): Either<Failure, Unit> {
         return withContext(Dispatchers.IO) {
             val encryptedMessage = cryptoManager.encryptToString(message)
-            localSource.updateNote(noteId, encryptedMessage.getOrElse(""), isPinned)
+            localSource.updateNote(noteId, encryptedMessage.getOrElse(""), isPinned, deletedAt)
         }
     }
 

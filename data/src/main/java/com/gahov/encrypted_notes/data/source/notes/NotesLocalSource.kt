@@ -11,7 +11,7 @@ interface NotesLocalSource {
 
     suspend fun addNotes(notes: List<NoteDTO>): Either<Failure, Unit>
 
-    suspend fun updateNote(id: Long, message: String, isPinned: Boolean): Either<Failure, Unit>
+    suspend fun updateNote(id: Long, message: String, isPinned: Boolean, deletedAt: Long): Either<Failure, Unit>
 
     suspend fun deleteById(id: Long): Either<Failure, Unit>
 

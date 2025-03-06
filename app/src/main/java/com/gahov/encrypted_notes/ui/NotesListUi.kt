@@ -12,8 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gahov.encrypted_notes.domain.entities.Note
 import com.gahov.encrypted_notes.NotesViewModel
+import com.gahov.encrypted_notes.domain.entities.Note
 import kotlinx.datetime.Clock.System.now
 
 /**
@@ -64,6 +64,10 @@ fun NotesListUi(
                     note.isPinned = isChanged
                     viewModel?.updateNote(note)
                 },
+                onDeleteDateChanged = { selectedTime ->
+                    note.deletedAt = selectedTime
+                    viewModel?.updateNote(note)
+                }
             )
         }
     }

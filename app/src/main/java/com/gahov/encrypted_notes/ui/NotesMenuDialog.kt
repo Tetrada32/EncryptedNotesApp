@@ -55,7 +55,7 @@ fun NotesMenuDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onCommandSelected(ActionCommand.Import) }
-                        .padding(top = 12.dp),
+                        .padding(top = 20.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 // Dark Mode toggle row.
@@ -68,7 +68,8 @@ fun NotesMenuDialog(
                     Text(
                         text = "Dark Mode",
                         fontSize = 16.sp,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 16.dp)
                     )
                     Switch(
                         checked = darkTheme,
