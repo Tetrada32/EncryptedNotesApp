@@ -1,16 +1,19 @@
 [versions]
 agp = "8.8.2"
+coreTesting = "2.2.0"
 kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinxCoroutinesTest = "1.6.4"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.02.00"
 composeHiltNav = "1.2.0"
 ksp = "2.1.10-1.0.30"
 hilt = "2.55"
+mockk = "1.13.3"
 room = "2.7.0-rc01"
 testng = "6.9.6"
 kotlinx-datetime = "0.6.2"
@@ -18,6 +21,7 @@ kotlinx-serialization = "1.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -26,6 +30,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "composeHiltNav" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
@@ -38,6 +43,7 @@ androidx-hilt = { group = "com.google.dagger", name = "hilt-android", version.re
 androidx-hiltcompiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt"}
 androidx-room = { group = "androidx.room", name = "room-runtime", version.ref = "room"}
 androidx-roomcompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"}
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 testng = { group = "org.testng", name = "testng", version.ref = "testng" }
 
 
