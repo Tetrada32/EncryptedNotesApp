@@ -29,9 +29,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gahov.encrypted_notes.domain.entities.Note
-import kotlinx.datetime.Clock.System.now
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.gahov.encrypted_notes.utils.formatDate
+import com.gahov.encrypted_notes.utils.yearFromNow
 
 /**
  * Displays a note item as a card with a pin checkbox, a deletion date indicator, and a three-dot menu
@@ -56,10 +55,10 @@ fun NoteItemUi(
     onPinChanged: ((Boolean) -> Unit)? = null,
     onDeleteDateChanged: ((Long) -> Unit)? = null,
 ) {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
     // Local state for the pinned checkbox.
     var isPinned by remember { mutableStateOf(note.isPinned) }
+
     // Local state to control the visibility of the date picker dialog.
     var showDatePickerDialog by remember { mutableStateOf(false) }
 
@@ -84,7 +83,6 @@ fun NoteItemUi(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Column for the note text and createdAt.
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = note.message ?: "",
@@ -93,7 +91,7 @@ fun NoteItemUi(
                     )
                     note.createdAt?.let {
                         Text(
-                            text = "Created at: ${dateFormat.format(it)}",
+                            text = "Created at: ${it.formatDate()}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                             fontSize = 12.sp
@@ -127,18 +125,19 @@ fun NoteItemUi(
                     }
                 }
             }
-            // If the note has a deletion date set, display it at the bottom in red.
+
+            /**
+             * If the note has a deletion date set, display it at the bottom in red.
+             */
             var deletedAtAsString by remember { mutableStateOf("") }
 
             LaunchedEffect(note.deletedAt) {
                 if (note.deletedAt == null) deletedAtAsString = ""
                 note.deletedAt?.let { deletedAt ->
-                    val yearFromNow = (now().toEpochMilliseconds() + (1000L * 60 * 60 * 24 * 365))
-                    if (deletedAt < yearFromNow) {
-                        // Format the date.
-                        deletedAtAsString = "Will be deleted at: ${dateFormat.format(deletedAt)}"
+                    deletedAtAsString = if (deletedAt < yearFromNow()) {
+                        "Will be deleted at: ${deletedAt.formatDate()}"
                     } else {
-                        deletedAtAsString = ""
+                        ""
                     }
                 }
             }
@@ -154,7 +153,6 @@ fun NoteItemUi(
         }
     }
 
-    // Display the Date Picker Dialog if requested.
     if (showDatePickerDialog) {
         TimePickerDialog(
             onTimeSelected = { selectedTime ->

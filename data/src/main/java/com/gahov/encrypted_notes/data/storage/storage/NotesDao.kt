@@ -15,6 +15,9 @@ interface NotesDao {
     @Query("SELECT * FROM notes")
     fun fetchAll(): Flow<List<NoteDTO>>
 
+    @Query("SELECT createdAt FROM notes")
+    suspend fun fetchAllMessages(): List<Long>
+
     @Query("UPDATE notes SET deletedAt = :deletedAt WHERE uid = :id")
     fun deleteItem(id: Long, deletedAt: Long)
 

@@ -24,7 +24,9 @@ class NotesLocalSourceImpl(private val notesDao: NotesDao) : NotesLocalSource {
 
     override suspend fun addNotes(notes: List<NoteDTO>): Either<Failure, Unit> {
         return try {
-            Either.Right(notesDao.insertItems(notes))
+            val existingMessages = notesDao.fetchAllMessages()
+            val uniqueNotes = notes.filter { it.createdAt !in existingMessages }
+            Either.Right(notesDao.insertItems(uniqueNotes))
         } catch (e: Exception) {
             Either.Left(Failure.DataSourceException(e))
         }

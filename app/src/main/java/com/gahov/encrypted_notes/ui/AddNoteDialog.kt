@@ -46,9 +46,7 @@ fun AddNoteDialog(
             TextButton(
                 onClick = {
                     if (noteText.isNotBlank()) {
-                        // Get the current time in milliseconds.
                         val currentTimeAsLong = now().toEpochMilliseconds()
-                        // Create a new note with the entered text and current timestamp.
                         val newNote = Note(
                             message = noteText,
                             createdAt = currentTimeAsLong,
