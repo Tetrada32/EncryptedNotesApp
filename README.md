@@ -1,5 +1,5 @@
 # 🔐 Encrypted Notes App
-*Test task by Danil Gahov 
+*Demo task by Danil Gahov 
 
 **Encrypted Notes App** is your new best friend when it comes to securely managing your personal notes! 📝✨
 
